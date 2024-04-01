@@ -45,10 +45,34 @@ user_args(
     visibility = ["//visibility:public"],
 )
 
-# This target provides the C headers for whatever the current toolchain is
-# for the consuming rule. It basically acts like a cc_library by forwarding
-# on the providers for the underlying cc_library that the toolchain is using.
-current_node_cc_headers(
+# Provides the currently active Node toolchain's C++ headers.
+#
+# Note, "node.h" is only usable from C++, and you'll need to
+# ensure you are compiling with c++14 or later.
+#
+# Also, on Windows, NodeJS releases do not ship headers, so this rule is currently
+# not usable with the built-in toolchains. If you define your own toolchain on Windows,
+# you can include the headers and then this rule will work.
+#
+# To use, simply depend on this target where you would have wanted the
+# toolchain's underlying `:headers` target:
+#
+# ```starlark
+# cc_library(
+#     name = "foo",
+#     srcs = ["foo.cc"],
+#     # If toolchain sets this already, you can omit.
+#     copts = ["-std=c++14"],
+#     deps = ["@rules_nodejs//:current_node_cc_headers"]
+# )
+# ```
+cc_library(
     name = "current_node_cc_headers",
+    hdrs = [":current_node_cc_headers_filegroup"],
+    includes = ["bin/nodejs/include/node"],
     visibility = ["//visibility:public"],
+)
+
+current_node_cc_headers(
+    name = "current_node_cc_headers_filegroup",
 )

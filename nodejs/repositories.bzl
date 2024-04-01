@@ -322,9 +322,9 @@ filegroup(
   name = "npm_files",
   srcs = {npm_files_glob}[":node_files"],
 )
-cc_library(
+filegroup(
   name = "headers",
-  hdrs = glob(
+  srcs = glob(
     ["bin/nodejs/include/node/**"],
     # Apparently, node.js doesn't ship the headers in their Windows package.
     # https://stackoverflow.com/questions/50745670/nodejs-headers-on-windows-are-not-installed-automatically
@@ -335,7 +335,6 @@ cc_library(
     # -> no results ...
     allow_empty = True,
   ),
-  includes = ["bin/nodejs/include/node"],
 )
 """.format(
         node_bin_export = "\n  \"%s\"," % node_bin,
